@@ -19,7 +19,7 @@ class Database
 
             try {
                 self::$instance = new PDO(
-                    "mysql:host={$host};dbname={$dbname};charset=utf8mb4",
+                    "pgsql:host={$host};port=5432;dbname={$dbname}",
                     $user,
                     $pass,
                     [

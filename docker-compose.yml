@@ -17,16 +17,17 @@ services:
       - DB_PASS=root
 
   db:
-    image: mysql:8.0
+    image: postgres:16-alpine
     container_name: gestor_tarefas_db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: gestor_tarefas
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: gestor_tarefas
     ports:
-      - "3306:3306"
+      - "5432:5432"
     volumes:
-      - db_data:/var/lib/mysql
+      - db_data:/var/lib/postgresql/data
       - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
 
 volumes:
