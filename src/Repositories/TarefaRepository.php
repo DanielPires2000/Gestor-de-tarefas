@@ -1,12 +1,16 @@
 <?php
 
-namespace App\Models;
+namespace App\Repositories;
 
 use App\Config\Database;
+use App\Interfaces\TarefaRepositoryInterface;
 use PDO;
 use Exception;
 
-class Tarefa
+/**
+ * Implementação do repositório de tarefas usando PostgreSQL
+ */
+class TarefaRepository implements TarefaRepositoryInterface
 {
     private PDO $db;
 

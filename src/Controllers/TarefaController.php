@@ -2,28 +2,27 @@
 
 namespace App\Controllers;
 
-use App\Models\Tarefa;
+use App\Services\TarefaService;
 use Exception;
 
 class TarefaController
 {
-    private Tarefa $model;
+    private TarefaService $service;
 
-    public function __construct()
+    public function __construct(TarefaService $service)
     {
-        $this->model = new Tarefa();
+        $this->service = $service;
     }
 
     /**
-     * Cenário A: Lista todas as tarefas (Home)
+     * Lista todas as tarefas (Home)
      */
     public function index(): void
     {
-        $tarefas = $this->model->listarTodas();
+        $tarefas = $this->service->listarTodas();
         $erro = $_SESSION['erro'] ?? null;
         $sucesso = $_SESSION['sucesso'] ?? null;
 
-        // Limpar mensagens da sessão
         unset($_SESSION['erro'], $_SESSION['sucesso']);
 
         require __DIR__ . '/../../views/home.php';
@@ -37,19 +36,18 @@ class TarefaController
         $erro = $_SESSION['erro'] ?? null;
         $dados = $_SESSION['dados'] ?? [];
 
-        // Limpar dados da sessão
         unset($_SESSION['erro'], $_SESSION['dados']);
 
         require __DIR__ . '/../../views/form.php';
     }
 
     /**
-     * Cenário B: Salva uma nova tarefa (POST)
+     * Salva uma nova tarefa (POST)
      */
     public function salvar(): void
     {
         try {
-            $this->model->salvar($_POST);
+            $this->service->criar($_POST);
             $_SESSION['sucesso'] = 'Tarefa criada com sucesso!';
             header('Location: index.php');
         } catch (Exception $e) {
@@ -61,7 +59,7 @@ class TarefaController
     }
 
     /**
-     * Cenário C: Marca tarefa como concluída
+     * Marca tarefa como concluída
      */
     public function concluir(): void
     {
@@ -69,7 +67,7 @@ class TarefaController
 
         if ($id) {
             try {
-                $this->model->concluir($id);
+                $this->service->concluir($id);
                 $_SESSION['sucesso'] = 'Tarefa concluída!';
             } catch (Exception $e) {
                 $_SESSION['erro'] = $e->getMessage();
@@ -88,8 +86,12 @@ class TarefaController
         $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 
         if ($id) {
-            $this->model->excluir($id);
-            $_SESSION['sucesso'] = 'Tarefa excluída!';
+            try {
+                $this->service->excluir($id);
+                $_SESSION['sucesso'] = 'Tarefa excluída!';
+            } catch (Exception $e) {
+                $_SESSION['erro'] = $e->getMessage();
+            }
         }
 
         header('Location: index.php');

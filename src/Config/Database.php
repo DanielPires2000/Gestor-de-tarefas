@@ -12,14 +12,15 @@ class Database
     public static function getConnection(): PDO
     {
         if (self::$instance === null) {
-            $host = getenv('DB_HOST') ?: 'localhost';
-            $dbname = getenv('DB_NAME') ?: 'gestor_tarefas';
-            $user = getenv('DB_USER') ?: 'root';
-            $pass = getenv('DB_PASS') ?: 'root';
+            $host = $_ENV['DB_HOST'];
+            $port = $_ENV['DB_PORT'];
+            $dbname = $_ENV['DB_NAME'];
+            $user = $_ENV['DB_USER'];
+            $pass = $_ENV['DB_PASS'];
 
             try {
                 self::$instance = new PDO(
-                    "pgsql:host={$host};port=5432;dbname={$dbname}",
+                    "pgsql:host={$host};port={$port};dbname={$dbname}",
                     $user,
                     $pass,
                     [

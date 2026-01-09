@@ -16,8 +16,7 @@
 Thumbs.db
 
 # Logs
-*.log
-logs/
+logs/*.log
 
 # Docker volumes (apenas locais)
 db_data/
