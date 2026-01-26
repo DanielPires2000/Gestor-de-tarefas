@@ -27,10 +27,13 @@ if ($isDebug) {
 use App\Config\Container;
 use App\Config\Logger;
 use App\Config\ErrorHandler;
+use App\Core\Router;
 use App\Interfaces\TarefaRepositoryInterface;
 use App\Repositories\TarefaRepository;
 use App\Services\TarefaService;
 use App\Controllers\TarefaController;
+use App\Controllers\DocsController;
+use App\Controllers\ComponentsController;
 
 // Registrar handler global de erros
 $logger = Logger::getInstance();
@@ -46,30 +49,10 @@ $container->singleton(TarefaService::class, fn($c) => new TarefaService($c->get(
 
 $container->singleton(TarefaController::class, fn($c) => new TarefaController($c->get(TarefaService::class)));
 
-// Resolver Controller via Container
-$controller = $container->get(TarefaController::class);
+$container->singleton(DocsController::class, fn() => new DocsController());
 
-// Roteamento
-$acao = $_GET['acao'] ?? 'index';
+$container->singleton(ComponentsController::class, fn() => new ComponentsController());
 
-switch ($acao) {
-    case 'nova':
-        $controller->formulario();
-        break;
-
-    case 'salvar':
-        $controller->salvar();
-        break;
-
-    case 'concluir':
-        $controller->concluir();
-        break;
-
-    case 'excluir':
-        $controller->excluir();
-        break;
-
-    default:
-        $controller->index();
-        break;
-}
+// Roteamento Dinâmico
+$router = new Router($container);
+$router->dispatch($_SERVER['REQUEST_URI']);

@@ -91,7 +91,8 @@ class ErrorHandler
      */
     private function renderErrorPage(Throwable $e): void
     {
-        http_response_code(500);
+        $code = $e->getCode() === 404 ? 404 : 500;
+        http_response_code($code);
 
         if ($this->debug) {
             // Modo desenvolvimento: mostra detalhes

@@ -3,29 +3,29 @@
 namespace App\Repositories;
 
 use App\Config\Database;
+use App\Core\ORM\BaseRepository;
+use App\Core\ORM\QueryBuilder;
+use App\Entities\Tarefa;
 use App\Interfaces\TarefaRepositoryInterface;
-use PDO;
 use Exception;
+use PDO;
 
 /**
- * Implementação do repositório de tarefas usando PostgreSQL
+ * Implementação do repositório de tarefas usando o ORM
  */
-class TarefaRepository implements TarefaRepositoryInterface
+class TarefaRepository extends BaseRepository implements TarefaRepositoryInterface
 {
-    private PDO $db;
-
-    public function __construct()
-    {
-        $this->db = Database::getConnection();
-    }
+    protected string $entityClass = Tarefa::class;
 
     /**
      * Lista todas as tarefas ordenadas por data de criação
      */
     public function listarTodas(): array
     {
-        $stmt = $this->db->query("SELECT * FROM tarefas ORDER BY data_criacao DESC");
-        return $stmt->fetchAll();
+        $tarefas = $this->findAll(['data_criacao' => 'DESC']);
+
+        // Converte entidades para arrays para manter compatibilidade
+        return array_map(fn($tarefa) => $tarefa->toArray(), $tarefas);
     }
 
     /**
@@ -33,10 +33,8 @@ class TarefaRepository implements TarefaRepositoryInterface
      */
     public function buscarPorId(int $id): ?array
     {
-        $stmt = $this->db->prepare("SELECT * FROM tarefas WHERE id = :id");
-        $stmt->execute(['id' => $id]);
-        $tarefa = $stmt->fetch();
-        return $tarefa ?: null;
+        $tarefa = $this->findById($id);
+        return $tarefa ? $tarefa->toArray() : null;
     }
 
     /**
@@ -45,24 +43,18 @@ class TarefaRepository implements TarefaRepositoryInterface
      */
     public function salvar(array $dados): int
     {
-        // Regra: Não aceitar tarefas sem título
         $titulo = trim($dados['titulo'] ?? '');
         if (empty($titulo)) {
             throw new Exception('O título da tarefa é obrigatório.');
         }
 
-        $descricao = trim($dados['descricao'] ?? '');
+        $tarefa = new Tarefa();
+        $tarefa->titulo = $titulo;
+        $tarefa->descricao = trim($dados['descricao'] ?? '');
+        $tarefa->status = 'pendente';
 
-        $stmt = $this->db->prepare(
-            "INSERT INTO tarefas (titulo, descricao, status) VALUES (:titulo, :descricao, 'pendente')"
-        );
-
-        $stmt->execute([
-            'titulo' => $titulo,
-            'descricao' => $descricao
-        ]);
-
-        return (int) $this->db->lastInsertId();
+        $savedTarefa = $this->save($tarefa);
+        return $savedTarefa->id ?? 0;
     }
 
     /**
@@ -71,17 +63,16 @@ class TarefaRepository implements TarefaRepositoryInterface
      */
     public function concluir(int $id): bool
     {
-        // Regra: Só é possível concluir uma tarefa que existe
-        $tarefa = $this->buscarPorId($id);
+        $tarefa = $this->findById($id);
         if (!$tarefa) {
             throw new Exception('Tarefa não encontrada.');
         }
 
-        $stmt = $this->db->prepare(
-            "UPDATE tarefas SET status = 'concluida' WHERE id = :id"
-        );
+        /** @var Tarefa $tarefa */
+        $tarefa->status = 'concluida';
+        $this->save($tarefa);
 
-        return $stmt->execute(['id' => $id]);
+        return true;
     }
 
     /**
@@ -89,7 +80,6 @@ class TarefaRepository implements TarefaRepositoryInterface
      */
     public function excluir(int $id): bool
     {
-        $stmt = $this->db->prepare("DELETE FROM tarefas WHERE id = :id");
-        return $stmt->execute(['id' => $id]);
+        return $this->delete($id);
     }
 }

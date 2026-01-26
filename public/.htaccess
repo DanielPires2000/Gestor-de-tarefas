@@ -1,0 +1,19 @@
+# Rewrite URLs para remover index.php
+# Todas as requisições vão para index.php
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    
+    # Permitir acesso a arquivos e diretórios existentes
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    
+    # Redirecionar tudo para index.php
+    RewriteRule ^(.*)$ index.php [L,QSA]
+</IfModule>
+
+# Segurança: Negar acesso a arquivos .env e similares
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>

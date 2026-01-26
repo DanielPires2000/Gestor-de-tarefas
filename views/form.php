@@ -210,7 +210,7 @@
                 </div>
             <?php endif; ?>
 
-            <form action="index.php?acao=salvar" method="POST">
+            <form action="/tarefa/salvar" method="POST">
                 <div class="form-group">
                     <label for="titulo">
                         Título <span class="required">*</span>
@@ -226,7 +226,7 @@
                 </div>
 
                 <div class="btn-group">
-                    <a href="index.php" class="btn btn-secondary">
+                    <a href="/tarefa" class="btn btn-secondary">
                         ← Cancelar
                     </a>
                     <button type="submit" class="btn btn-primary">
@@ -236,7 +236,7 @@
             </form>
         </div>
 
-        <a href="index.php" class="back-link">← Voltar para a lista de tarefas</a>
+        <a href="/tarefa" class="back-link">← Voltar para a lista de tarefas</a>
     </div>
 </body>
 

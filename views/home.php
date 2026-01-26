@@ -262,7 +262,7 @@
         <?php endif; ?>
 
         <div class="actions-bar">
-            <a href="index.php?acao=nova" class="btn btn-primary">
+            <a href="/tarefa/formulario" class="btn btn-primary">
                 ➕ Nova Tarefa
             </a>
         </div>
@@ -310,12 +310,12 @@
                                 <td>
                                     <div class="actions-cell">
                                         <?php if ($tarefa['status'] !== 'concluida'): ?>
-                                            <a href="index.php?acao=concluir&id=<?= $tarefa['id'] ?>" class="btn btn-success btn-sm"
+                                            <a href="/tarefa/concluir/<?= $tarefa['id'] ?>" class="btn btn-success btn-sm"
                                                 title="Marcar como concluída">
                                                 ✓
                                             </a>
                                         <?php endif; ?>
-                                        <a href="index.php?acao=excluir&id=<?= $tarefa['id'] ?>" class="btn btn-danger btn-sm"
+                                        <a href="/tarefa/excluir/<?= $tarefa['id'] ?>" class="btn btn-danger btn-sm"
                                             onclick="return confirm('Tem certeza que deseja excluir esta tarefa?')"
                                             title="Excluir tarefa">
                                             🗑
